@@ -1,0 +1,63 @@
+#include <Servo.h>
+
+Servo servoMetal;   // Objeto servo para Metal
+Servo servoPlastic; // Objeto servo para Plastic
+Servo servoPaper;   // Objeto servo para Paper
+
+// Pinos digitais do Arduino onde os servos estão conectados
+int pinMetal = 9;
+int pinPlastic = 10;
+int pinPaper = 11;
+
+// Ângulos
+const int OPEN_ANGLE = 70;  // Ângulo para abrir (70 graus)
+const int CLOSED_ANGLE = 0; // Ângulo para fechar (posição inicial)
+
+void setup() {
+  Serial.begin(9600); // Inicia a comunicação serial a 9600 bits por segundo
+  
+  servoMetal.attach(pinMetal);     // Associa o objeto servo ao pino para Metal
+  servoPlastic.attach(pinPlastic); // Associa o objeto servo ao pino para Plastic
+  servoPaper.attach(pinPaper);     // Associa o objeto servo ao pino para Paper
+
+  // Garante que todos os servos comecem na posição fechada
+  servoMetal.write(CLOSED_ANGLE);
+  servoPlastic.write(CLOSED_ANGLE);
+  servoPaper.write(CLOSED_ANGLE);
+  
+  Serial.println("Arduino pronto. Servos nas posicoes iniciais.");
+}
+
+void loop() {
+  if (Serial.available() > 0) { // Se há dados disponíveis na porta serial
+    char command = Serial.read(); // Lê o byte de entrada
+
+    switch (command) {
+      case 'M': // Comando para Metal
+        Serial.println("Comando 'Metal' recebido. Movendo servo Metal.");
+        moveServo(servoMetal);
+        break;
+      case 'P': // Comando para Plastic
+        Serial.println("Comando 'Plastic' recebido. Movendo servo Plastic.");
+        moveServo(servoPlastic);
+        break;
+      case 'R': // Comando para Paper
+        Serial.println("Comando 'Paper' recebido. Movendo servo Paper.");
+        moveServo(servoPaper);
+        break;
+      default:
+        Serial.print("Comando desconhecido recebido: ");
+        Serial.println(command);
+        break;
+    }
+  }
+}
+
+// Função auxiliar para mover um servo específico
+void moveServo(Servo& servoToMove) {
+  servoToMove.write(OPEN_ANGLE); // Move o servo para o ângulo de abertura
+  delay(5000); // Espera 5 segundos
+
+  servoToMove.write(CLOSED_ANGLE); // Move o servo de volta para a posição inicial (fechado)
+  delay(1000); // Pequena pausa para o servo completar o movimento
+}
